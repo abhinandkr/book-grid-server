@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import path from 'path';
 import helmet from 'helmet';
+import cors from 'cors';
 
 import express, {NextFunction, Request, Response} from 'express';
 import StatusCodes from 'http-status-codes';
@@ -34,6 +35,8 @@ if (process.env.NODE_ENV === 'development') {
 if (process.env.NODE_ENV === 'production') {
 	app.use(helmet());
 }
+
+app.use(cors());
 
 
 /*******************************************************************************

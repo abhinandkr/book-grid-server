@@ -6,18 +6,28 @@ import BookGridService from '@services/book-grid-service';
 const router = Router();
 const {OK} = StatusCodes;
 
-export const p = {
-	get: '/bookData/:year',
-} as const;[]
+export const routes = {
+	getReadBookList: '/readBookList/:year',
+	getBookThumbnail: '/bookThumbnail/:isbn',
+} as const;
 
 const bookGridService = new BookGridService();
 
-router.get(p.get, async (request: Request, response: Response) => {
+router.get(routes.getReadBookList, async (request: Request, response: Response) => {
 	const {year} = request.params;
-	const bookArray = await bookGridService.getBookData(year);
+	const bookList = await bookGridService.getReadBookList(year);
 	return response
-		.set('Access-Control-Allow-Origin', 'http://localhost:3000')
-		.json({bookArray})
+		.set('Access-Control-Allow-Origin', '*')
+		.json({bookList})
+		.status(OK);
+});
+
+router.get(routes.getBookThumbnail, async (request: Request, response: Response) => {
+	const {isbn} = request.params;
+	const thumbnailUrl = await bookGridService.getBookThumbnailUrl(isbn);
+	return response
+		.set('Access-Control-Allow-Origin', '*')
+		.json({thumbnailUrl})
 		.status(OK);
 });
 
