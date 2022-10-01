@@ -47,23 +47,17 @@ export default class BookGridService {
 	public async getBookThumbnailUrl(isbn: string) {
 		const url = `https://www.googleapis.com/books/v1/volumes`;
 
-		function timeout(ms: number) {
-			return new Promise(resolve => setTimeout(resolve, ms));
-		}
-
-		async function sleep(fn: any, ...args: any) {
-			await timeout(10000);
-			console.log('Query')
-			return fn(...args);
-		}
-
-		let res;
-		res = await sleep(axios.get, url, {
+		const googleApiAsyncTask = this.getAsyncTask(
+			5000,
+			`volumes(${isbn})`,
+			axios.get, {
 			params: {
 				key: 'AIzaSyD9PvKJYFp0YxcvOszMykAUgo58-x4VuJw',
 				q: `isbn:${isbn}`,
 			},
 		});
+
+		const res = await googleApiAsyncTask();
 
 		let thumbnail = _.get(res,
 			'data.items[0].volumeInfo.imageLinks.thumbnail',
@@ -75,5 +69,20 @@ export default class BookGridService {
 		}
 		console.log(thumbnail);
 		return thumbnail;
+	}
+
+	private getAsyncTask(time: number, taskName: string, proc: any, ...args: any) {
+		return function timeOut() {
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					proc(...args).then((res: any) => {
+						console.log(`${taskName} done in ${time} ms`);
+						resolve(res);
+					}, (err: any) => {
+						reject(err);
+					});
+				}, time);
+			});
+		};
 	}
 }
