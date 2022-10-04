@@ -73,7 +73,9 @@ export default class BookGridService {
 		});
 
 		const thumbnail = this.getThumbnailImage(res);
-		this.cache.set(isbn, thumbnail);
+		if (thumbnail !== null) {
+			this.cache.set(isbn, thumbnail);
+		}
 		return thumbnail;
 	}
 
@@ -93,6 +95,6 @@ export default class BookGridService {
 			'data.items[0].volumeInfo.imageLinks.thumbnail',
 			_.get(
 				res,
-				'data.items[1].volumeInfo.imageLinks.thumbnail', ''));
+				'data.items[1].volumeInfo.imageLinks.thumbnail', null));
 	}
 }
