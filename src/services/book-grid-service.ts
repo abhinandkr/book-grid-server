@@ -3,11 +3,21 @@ import * as path from 'path';
 import {parse} from 'csv-parse';
 import axios from 'axios';
 import _ from 'lodash';
+import NodeCache from 'node-cache';
 
 export default class BookGridService {
-	public async getReadBookList(year: string) {
-		const fileName = path.join(__dirname, '../../res/goodreads_library_export.csv');
-		const headers = ['Book Id', 'Title', 'Author', 'Author l-f', 'Additional Authors', 'ISBN', 'ISBN13', 'My Rating', 'Average Rating', 'Publisher', 'Binding', 'Number of Pages', 'Year Published', 'Original Publication Year', 'Date Read', 'Date Added', 'Bookshelves', 'Bookshelves with positions', 'Exclusive Shelf', 'My Review', 'Spoiler', 'Private Notes', 'Read Count', 'Owned Copies'];
+
+	private cache: NodeCache;
+
+	constructor() {
+		this.cache = new NodeCache({stdTTL: 86400});
+	}
+
+	public async getReadBookList(year: string): Promise<any []> {
+		const fileName = path.join(
+			__dirname, '../../res/goodreads_library_export.csv');
+		// eslint-disable-next-line max-len
+		const headers = ['Book Id', 'Title', 'Author', 'Author l-f', 'Additional Authors', 'ISBN', 'ISBN13', 'My Rating', 'Average Rating', 'Publisher', 'Binding', 'Number of Pages', 'Year Published', 'Original Publication Year', 'Date Read', 'Date Added', 'Bookshelves', 'Bookshelves with positions', 'Exclusive Shelf', 'My Review', 'Spoiler', 'Private Notes', 'Read Count', 'Owned Copies', 'Cover Art'];
 		const parser = fs
 			.createReadStream(fileName)
 			.pipe(parse({
@@ -36,44 +46,53 @@ export default class BookGridService {
 				if (isbn !== null) {
 					isbn = isbn[0];
 				}
-				const myRating = record['My Rating'];
-				const title = record['Title'];
-				result.push({isbn, myRating, title});
+				result.push({
+					isbn,
+					myRating: record['My Rating'],
+					title: record['Title'],
+					coverArtUrl: record['Cover Art'],
+				});
 			}
 		}
 		return result;
 	}
 
-	public async getBookThumbnailUrl(isbn: string) {
+	public async getBookThumbnailUrl(isbn: string): Promise<string | undefined> {
 		const url = `https://www.googleapis.com/books/v1/volumes`;
+		const key = 'AIzaSyD9PvKJYFp0YxcvOszMykAUgo58-x4VuJw';
 
-		function timeout(ms: number) {
-			return new Promise(resolve => setTimeout(resolve, ms));
+		if (this.cache.has(isbn)) {
+			return this.cache.get(isbn);
 		}
 
-		async function sleep(fn: any, ...args: any) {
-			await timeout(10000);
-			console.log('Query')
-			return fn(...args);
-		}
-
-		let res;
-		res = await sleep(axios.get, url, {
+		const res = await this.sleep(2000, axios.get, url, {
 			params: {
-				key: 'AIzaSyD9PvKJYFp0YxcvOszMykAUgo58-x4VuJw',
+				key,
 				q: `isbn:${isbn}`,
 			},
 		});
 
-		let thumbnail = _.get(res,
-			'data.items[0].volumeInfo.imageLinks.thumbnail',
-			'');
-
-		if (thumbnail === '') {
-			thumbnail = _.get(res,
-				'data.items[1].volumeInfo.imageLinks.thumbnail', '');
-		}
-		console.log(thumbnail);
+		const thumbnail = this.getThumbnailImage(res);
+		this.cache.set(isbn, thumbnail);
 		return thumbnail;
+	}
+
+	private async timeout(ms: number) {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
+	// eslint-disable-next-line max-len
+	private async sleep(ms: number, fn: (...params: any) => Promise<any>, ...args: any): Promise<any> {
+		await this.timeout(ms);
+		return fn(...args);
+	}
+
+	private getThumbnailImage(res: any): string {
+		return _.get(
+			res,
+			'data.items[0].volumeInfo.imageLinks.thumbnail',
+			_.get(
+				res,
+				'data.items[1].volumeInfo.imageLinks.thumbnail', ''));
 	}
 }
