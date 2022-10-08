@@ -6,7 +6,7 @@ phases:
     runtime-versions:
       nodejs: latest
     commands:
-      - echo Installing Mocha...
+      - echo Installing yarn...
       - npm install -g yarn
   pre_build:
     commands:
@@ -25,7 +25,6 @@ phases:
 # used only for building and testing.
 # ExpressJS apps will need other artifact directories included (bin/*, public/*, routes/*, views/* etc).
 artifacts:
-  type: zip
   files:
     - 'dist/**/*'
     - yarn.lock
