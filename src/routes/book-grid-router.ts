@@ -13,6 +13,7 @@ export const routes = {
 
 const bookGridService = new BookGridService();
 
+// eslint-disable-next-line max-len
 router.get(routes.getReadBookList, async (request: Request, response: Response) => {
 	const {year} = request.params;
 	const bookList = await bookGridService.getReadBookList(year);
@@ -22,6 +23,7 @@ router.get(routes.getReadBookList, async (request: Request, response: Response) 
 		.status(OK);
 });
 
+// eslint-disable-next-line max-len
 router.get(routes.getBookThumbnail, async (request: Request, response: Response) => {
 	const {isbn} = request.params;
 	const thumbnailUrl = await bookGridService.getBookThumbnailUrl(isbn);

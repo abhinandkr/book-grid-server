@@ -1,5 +1,4 @@
 import logger from 'jet-logger';
-import axios from 'axios';
 
 /**
  * Print an error object if it's truthy. Useful for testing.
@@ -13,10 +12,14 @@ export function pErr(err?: Error): void {
 }
 
 /**
- * Make a http get request
- * @param url {string} URL
- * @param params {object} params to the get request
+ * Get environment variable
+ * @param key {string} - Key
  */
-export async function httpGet(url: string, params?: object) {
-	return await axios.get(url, params);
+export function getEnv(key: string) {
+	if (!process.env[key]) {
+		const err = new Error(`You forgot to set ${key} in the environment`);
+		pErr(err);
+		throw err;
+	}
+	return process.env[key];
 }
