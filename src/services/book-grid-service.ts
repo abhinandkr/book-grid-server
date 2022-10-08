@@ -18,7 +18,7 @@ export default class BookGridService {
 
 	public async getReadBookList(year: string): Promise<any []> {
 		const fileName = path.join(
-			__dirname, '../../res/goodreads_library_export.csv');
+			__dirname, '../resources/goodreads_library_export.csv');
 		// eslint-disable-next-line max-len
 		const columns = ['Book Id', 'Title', 'Author', 'Author l-f', 'Additional Authors', 'ISBN', 'ISBN13', 'My Rating', 'Average Rating', 'Publisher', 'Binding', 'Number of Pages', 'Year Published', 'Original Publication Year', 'Date Read', 'Date Added', 'Bookshelves', 'Bookshelves with positions', 'Exclusive Shelf', 'My Review', 'Spoiler', 'Private Notes', 'Read Count', 'Owned Copies', 'Cover Art'];
 		const parser = fs
