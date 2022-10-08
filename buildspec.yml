@@ -26,7 +26,8 @@ phases:
 # ExpressJS apps will need other artifact directories included (bin/*, public/*, routes/*, views/* etc).
 artifacts:
   files:
+    - Procfile
     - dist/**/*
-    - yarn.lock
-    - package.json
     - node_modules/**/*
+    - package.json
+    - yarn.lock
