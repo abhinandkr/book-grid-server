@@ -9,6 +9,9 @@ import commandLineArgs from 'command-line-args';
 
 
 (() => {
+	if (process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
+		return;
+	}
 	// Setup command line options
 	const options = commandLineArgs([
 		{
