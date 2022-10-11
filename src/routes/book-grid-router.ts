@@ -26,10 +26,10 @@ router.get(routes.getReadBookList, async (request: Request, response: Response) 
 // eslint-disable-next-line max-len
 router.get(routes.getBookThumbnail, async (request: Request, response: Response) => {
 	const {isbn} = request.params;
-	const thumbnailUrl = await bookGridService.getBookThumbnailUrl(isbn);
+	const googleBookDetails = await bookGridService.getBookThumbnailUrl(isbn);
 	return response
 		.set('Access-Control-Allow-Origin', '*')
-		.json({thumbnailUrl})
+		.json({googleBookDetails})
 		.status(OK);
 });
 

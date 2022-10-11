@@ -60,7 +60,8 @@ export default class BookGridService {
 		return result;
 	}
 
-	public async getBookThumbnailUrl(isbn: string): Promise<string | undefined> {
+	// eslint-disable-next-line max-len
+	public async getBookThumbnailUrl(isbn: string): Promise<{thumbnailUrl: string, googleBooksUrl: string} | undefined> {
 		if (this.cache.has(isbn)) {
 			return this.cache.get(isbn);
 		}
@@ -72,11 +73,13 @@ export default class BookGridService {
 			},
 		});
 
-		const thumbnail = this.getThumbnailImage(res);
-		if (thumbnail !== null) {
-			this.cache.set(isbn, thumbnail);
+		const thumbnailUrl = this.getThumbnailImage(res);
+		const googleBooksUrl = this.getGoogleBooksUrl(res);
+		const ret = {thumbnailUrl, googleBooksUrl};
+		if (thumbnailUrl !== null && googleBooksUrl !== null) {
+			this.cache.set(isbn, ret);
 		}
-		return thumbnail;
+		return ret;
 	}
 
 	private async timeout(ms: number) {
@@ -97,6 +100,17 @@ export default class BookGridService {
 				_.get(
 					res,
 					'data.items[1].volumeInfo.imageLinks.thumbnail', null))
+		);
+	}
+
+	private getGoogleBooksUrl(res: any): string {
+		return (
+			_.get(
+				res,
+				'data.items[0].volumeInfo.canonicalVolumeLink',
+				_.get(
+					res,
+					'data.items[1].volumeInfo.infoLink', null))
 		);
 	}
 }
