@@ -5,18 +5,15 @@ phases:
   install:
     runtime-versions:
       nodejs: latest
-    commands:
-      - echo Installing yarn...
-      - npm install -g yarn
   pre_build:
     commands:
-      - echo Installing source yarn dependencies...
-      - yarn
+      - echo Installing source npm dependencies...
+      - npm install
   build:
     commands:
       - echo Build started on `date`
-      - echo Compiling the Node.js code
-      - yarn build
+      - echo Running npm build
+      - npm run build
   post_build:
     commands:
       - echo Build completed on `date`
