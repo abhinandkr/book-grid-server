@@ -6,7 +6,7 @@ import _ from 'lodash';
 import NodeCache from 'node-cache';
 import {getEnv, pErr} from '@shared/functions';
 // @ts-ignore
-import {BookDetails} from 'book-grid-library';
+import {BookDisplayItem, ReadBookListItem} from 'book-grid-library';
 
 export default class BookGridService {
 
@@ -27,7 +27,7 @@ export default class BookGridService {
 	}
 
 	public async getReadBookList(year: string, pageNumber: string, resultsPerPage: string): Promise<any[]> {
-		const result = [];
+		const result: ReadBookListItem = [];
 		for (let i = 0; i < this.records.length; i++) {
 			const record = this.records[i];
 			if (this.isRead(record) && this.isReadInYear(record, year)) {
@@ -48,7 +48,7 @@ export default class BookGridService {
 		return result.slice(rpp * (pn - 1), rpp * pn);
 	}
 
-	public async getBookThumbnailUrl(isbn: string): Promise<BookDetails | undefined> {
+	public async getBookThumbnailUrl(isbn: string): Promise<BookDisplayItem | undefined> {
 		if (this.cache.has(isbn)) {
 			return this.cache.get(isbn);
 		}
