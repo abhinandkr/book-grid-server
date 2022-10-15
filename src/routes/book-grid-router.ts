@@ -8,6 +8,7 @@ const {OK} = StatusCodes;
 
 export const routes = {
 	init: '/init',
+	getReadCount: '/readCount/:year',
 	getReadBookList: '/readBookList/:year/:pageNumber/:resultsPerPage',
 	getBookThumbnail: '/bookThumbnail/:isbn',
 } as const;
@@ -15,10 +16,19 @@ export const routes = {
 const bookGridService = new BookGridService();
 
 router.get(routes.init, async (request: Request, response: Response) => {
-	const recordLength = await bookGridService.readData();
+	const recordLength = await bookGridService.init();
 	return response
 		.set('Access-Control-Allow-Origin', '*')
 		.json({recordLength})
+		.status(OK);
+});
+
+router.get(routes.getReadCount, async (request: Request, response: Response) => {
+	const {year} = request.params;
+	const readCount = await bookGridService.getReadCount(year);
+	return response
+		.set('Access-Control-Allow-Origin', '*')
+		.json({readCount})
 		.status(OK);
 });
 

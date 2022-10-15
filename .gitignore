@@ -104,5 +104,3 @@ fabric.properties
 /src/pre-start/env/
 
 .rpt2_cache/
-
-.env.development

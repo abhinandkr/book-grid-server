@@ -20,6 +20,12 @@ export default class BookGridService {
 		this.records = [];
 	}
 
+	public async getReadCount(year: string): Promise<number> {
+		return this.records.filter((record: any) => {
+			return this.isRead(record) && this.isReadInYear(record, year);
+		}).length;
+	}
+
 	public async getReadBookList(year: string, pageNumber: string, resultsPerPage: string): Promise<any[]> {
 		const result = [];
 		for (let i = 0; i < this.records.length; i++) {
@@ -37,12 +43,9 @@ export default class BookGridService {
 				});
 			}
 		}
-		if (resultsPerPage === '0' || pageNumber === '0') {
-			return result;
-		}
 		const rpp = parseInt(resultsPerPage);
 		const pn = parseInt(pageNumber);
-		return result.slice(rpp * pn, rpp * (pn + 1));
+		return result.slice(rpp * (pn - 1), rpp * pn);
 	}
 
 	public async getBookThumbnailUrl(isbn: string): Promise<BookDetails | undefined> {
@@ -66,7 +69,10 @@ export default class BookGridService {
 		return ret;
 	}
 
-	public async readData() {
+	public async init() {
+		if (this.records.length !== 0) {
+			return Promise.resolve(this.records.length);
+		}
 		return await this.readCSV();
 	}
 
@@ -127,9 +133,7 @@ export default class BookGridService {
 
 		try {
 			for await (const record of parser) {
-				// if (conditions.every((condition) => condition(record))) {
 				this.records.push(record);
-				// }
 			}
 		} catch (e) {
 			this.records = [];
