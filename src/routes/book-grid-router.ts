@@ -7,29 +7,46 @@ const router = Router();
 const {OK} = StatusCodes;
 
 export const routes = {
-	getReadBookList: '/readBookList/:year',
+	init: '/init',
+	getReadCount: '/readCount/:year',
+	getReadBookList: '/readBookList/:year/:pageNumber/:resultsPerPage',
 	getBookThumbnail: '/bookThumbnail/:isbn',
 } as const;
 
 const bookGridService = new BookGridService();
 
-// eslint-disable-next-line max-len
-router.get(routes.getReadBookList, async (request: Request, response: Response) => {
+router.get(routes.init, async (request: Request, response: Response) => {
+	const recordLength = await bookGridService.init();
+	return response
+		.set('Access-Control-Allow-Origin', '*')
+		.json({recordLength})
+		.status(OK);
+});
+
+router.get(routes.getReadCount, async (request: Request, response: Response) => {
 	const {year} = request.params;
-	const bookList = await bookGridService.getReadBookList(year);
+	const readCount = await bookGridService.getReadCount(year);
+	return response
+		.set('Access-Control-Allow-Origin', '*')
+		.json({readCount})
+		.status(OK);
+});
+
+router.get(routes.getReadBookList, async (request: Request, response: Response) => {
+	const {year, pageNumber, resultsPerPage} = request.params;
+	const bookList = await bookGridService.getReadBookList(year, pageNumber, resultsPerPage);
 	return response
 		.set('Access-Control-Allow-Origin', '*')
 		.json({bookList})
 		.status(OK);
 });
 
-// eslint-disable-next-line max-len
 router.get(routes.getBookThumbnail, async (request: Request, response: Response) => {
 	const {isbn} = request.params;
-	const thumbnailUrl = await bookGridService.getBookThumbnailUrl(isbn);
+	const googleBookDetails = await bookGridService.getBookThumbnailUrl(isbn);
 	return response
 		.set('Access-Control-Allow-Origin', '*')
-		.json({thumbnailUrl})
+		.json({googleBookDetails})
 		.status(OK);
 });
 
