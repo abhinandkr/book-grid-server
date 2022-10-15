@@ -7,23 +7,30 @@ const router = Router();
 const {OK} = StatusCodes;
 
 export const routes = {
-	getReadBookList: '/readBookList/:year',
+	init: '/init',
+	getReadBookList: '/readBookList/:year/:pageNumber/:resultsPerPage',
 	getBookThumbnail: '/bookThumbnail/:isbn',
 } as const;
 
 const bookGridService = new BookGridService();
 
-// eslint-disable-next-line max-len
+router.get(routes.init, async (request: Request, response: Response) => {
+	const recordLength = await bookGridService.readData();
+	return response
+		.set('Access-Control-Allow-Origin', '*')
+		.json({recordLength})
+		.status(OK);
+});
+
 router.get(routes.getReadBookList, async (request: Request, response: Response) => {
-	const {year} = request.params;
-	const bookList = await bookGridService.getReadBookList(year);
+	const {year, pageNumber, resultsPerPage} = request.params;
+	const bookList = await bookGridService.getReadBookList(year, pageNumber, resultsPerPage);
 	return response
 		.set('Access-Control-Allow-Origin', '*')
 		.json({bookList})
 		.status(OK);
 });
 
-// eslint-disable-next-line max-len
 router.get(routes.getBookThumbnail, async (request: Request, response: Response) => {
 	const {isbn} = request.params;
 	const googleBookDetails = await bookGridService.getBookThumbnailUrl(isbn);

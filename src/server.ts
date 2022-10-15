@@ -75,6 +75,5 @@ app.get('*', (_: Request, res: Response) => {
 	res.sendFile('index.html', {root: viewsDir});
 });
 
-
 // Export here and start in a diff file (for testing).
 export default app;
